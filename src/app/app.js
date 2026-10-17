@@ -1,23 +1,29 @@
 const fs = require('fs');
 
-function getRandomItemFromNode() {
+function getRandomItems(count = 10) {
   try {
-    // 1. Read the JSON file synchronously (or use fs.readFile asynchronously)
     const rawData = fs.readFileSync('database.json', 'utf8');
-
-    // 2. Parse the string data into a JavaScript array
     const dataArray = JSON.parse(rawData);
 
-    // 3. Select a random index
-    const randomIndex = Math.floor(Math.random() * dataArray.length);
-    
-    // 4. Grab the item
-    const randomItem = dataArray[randomIndex];
+    if (!Array.isArray(dataArray)) {
+      throw new Error('database.json must contain an array');
+    }
 
-    console.log("Random data retrieved:", randomItem);
-    return randomItem;
+    // Fisher-Yates shuffle on a copy, then take the first `count`
+    const shuffled = [...dataArray];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    const items = shuffled.slice(0, count); // safely handles count > length
+
+    items.forEach(item => console.log("Random data retrieved:", item));
+    return items;
   } catch (error) {
-    console.error("Error reading file:", error);
+    console.error("Error loading random items:", error);
+    return [];
   }
 }
-getRandomItemFromNode();
+
+getRandomItems(10);

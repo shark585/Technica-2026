@@ -1,69 +1,145 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+import { useEffect, useState } from "react";
+import data from "./database.json";
+
+type Row = {
+  language: string;
+  short_title: string;
+  published_version_of_question: string;
+  human_wrong_percentage: number;
+  option_a: string;
+  option_a_correctness: number;
+  option_b: string;
+  option_b_correctness: number;
+  option_c: string;
+  option_c_correctness: number;
+};
+
+type Option = { text: string; correct: boolean };
+type Quiz = { title: string; text: string; wrongPct: number; options: Option[] };
+
+const COUNT = 10;
+
+function shuffle<T>(array: T[]): T[] {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function toQuiz(row: Row): Quiz {
+  const options: Option[] = [
+    { text: row.option_a, correct: row.option_a_correctness === 1 },
+    { text: row.option_b, correct: row.option_b_correctness === 1 },
+    { text: row.option_c, correct: row.option_c_correctness === 1 },
+  ].filter((o) => o.text); // skip missing options
+
+  return {
+    title: row.short_title,
+    text: row.published_version_of_question,
+    wrongPct: row.human_wrong_percentage,
+    options: shuffle(options),
+  };
+}
+
+export default function Page() {
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [index, setIndex] = useState(0);
+  const [picked, setPicked] = useState<number | null>(null);
+  const [score, setScore] = useState(0);
+
+  const start = () => {
+    const rows = (data as unknown as Row[]).filter(
+      (r) => r.language === "en-US" && r.published_version_of_question
+    );
+    setQuizzes(shuffle(rows).slice(0, COUNT).map(toQuiz));
+    setIndex(0);
+    setPicked(null);
+    setScore(0);
+  };
+
+  // Shuffle after mount so server and client HTML match
+  useEffect(() => {
+    start();
+  }, []);
+
+  if (quizzes.length === 0) return <main style={{ padding: 24 }}>Loading...</main>;
+
+  if (index >= quizzes.length) {
+    return (
+      <main style={{ padding: 24 }}>
+        <h1>Done!</h1>
+        <p>
+          You got {score} of {quizzes.length} right.
+        </p>
+        <button onClick={start}>Try again</button>
       </main>
-    </div>
+    );
+  }
+
+  const quiz = quizzes[index];
+  const answered = picked !== null;
+
+  const choose = (i: number) => {
+    if (answered) return;
+    setPicked(i);
+    if (quiz.options[i].correct) setScore((s) => s + 1);
+  };
+
+  const next = () => {
+    setPicked(null);
+    setIndex((i) => i + 1);
+  };
+
+  const colorFor = (i: number) => {
+    if (!answered) return undefined;
+    if (quiz.options[i].correct) return "#c8f7c5"; // right answer
+    if (i === picked) return "#f7c5c5"; // your wrong pick
+    return undefined;
+  };
+
+  return (
+    <main style={{ padding: 24, maxWidth: 600 }}>
+      <p>
+        Question {index + 1} of {quizzes.length}
+      </p>
+      <h2>{quiz.title}</h2>
+      <p>{quiz.text}</p>
+
+      <div style={{ display: "grid", gap: 8 }}>
+        {quiz.options.map((o, i) => (
+          <button
+            key={i}
+            onClick={() => choose(i)}
+            disabled={answered}
+            style={{
+              padding: 12,
+              textAlign: "left",
+              background: colorFor(i) ?? "#fff",
+              color: "#000",
+              border: "1px solid #999",
+              borderRadius: 6,
+            }}
+          >
+            {o.text}
+          </button>
+        ))}
+      </div>
+
+      {answered && (
+        <>
+          <p>
+            {quiz.options[picked].correct ? "Correct!" : "Not quite."}{" "}
+            {quiz.wrongPct}% of people get this one wrong.
+          </p>
+          <button onClick={next}>
+            {index + 1 === quizzes.length ? "See results" : "Next"}
+          </button>
+        </>
+      )}
+    </main>
   );
 }

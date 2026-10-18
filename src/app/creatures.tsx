@@ -145,47 +145,130 @@ function Turtle() {
 
 function Dolphin() {
   return (
-    <svg viewBox="0 0 220 100" width="100%">
+    <svg viewBox="0 0 240 120" width="100%" overflow="visible">
       <defs>
         <linearGradient id="dp-body" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#3f5d78" />
-          <stop offset="0.45" stopColor="#8aa3b8" />
-          <stop offset="0.75" stopColor="#d3dee6" />
-          <stop offset="1" stopColor="#f1f5f8" />
+          <stop offset="0" stopColor="#1f3a52" />
+          <stop offset="0.38" stopColor="#4f7391" />
+          <stop offset="0.6" stopColor="#a9bfce" />
+          <stop offset="1" stopColor="#f0f5f8" />
+        </linearGradient>
+        <linearGradient id="dp-fin" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#2f4d68" />
+          <stop offset="1" stopColor="#7d9bb2" />
         </linearGradient>
       </defs>
-      <g className="wag" style={wag(34, 46, 9, 0.9)}>
-        <path d="M34 46 C20 52 8 50 0 62 C14 58 26 56 36 50Z M34 44 C20 38 8 40 0 26 C14 30 26 34 36 40Z" fill="#4b6a85" />
+
+      {/* Whole dolphin tilted up, as if leaping */}
+      <g transform="rotate(-10 120 70)">
+        {/* Flukes */}
+        <g className="wag" style={wag(40, 70, 10, 0.8)}>
+          <path
+            d="M42 66 C28 62 16 56 6 48 C14 58 16 66 12 72 C16 78 14 86 6 94 C18 88 30 80 42 74Z"
+            fill="url(#dp-fin)"
+          />
+        </g>
+
+        {/* Dorsal fin */}
+        <path d="M114 42 C122 22 140 14 156 12 C151 22 151 32 156 42Z" fill="url(#dp-fin)" />
+
+        {/* Body */}
+        <path
+          d="M38 68 C66 56 94 44 116 40 C128 38 140 38 152 40 C170 40 188 42 200 46 C206 47 210 50 212 52 L234 56 C236 58 234 61 230 61 L208 62 C192 80 160 94 124 94 C88 94 58 84 38 72Z"
+          fill="url(#dp-body)"
+        />
+
+        {/* Wet sheen along the back */}
+        <path d="M68 62 C98 50 140 46 184 48" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity="0.25" fill="none" />
+        <path d="M150 52 C170 52 186 54 198 58" stroke="#fff" strokeWidth="2" strokeLinecap="round" opacity="0.18" fill="none" />
+
+        {/* Pectoral flipper */}
+        <g className="wag" style={wag(152, 72, 12, 1.1)}>
+          <path d="M152 72 C144 90 132 100 116 106 C134 104 150 96 162 80Z" fill="url(#dp-fin)" />
+        </g>
+
+        {/* Mouth line and eye */}
+        <path d="M232 59 C222 61 214 61 206 57" stroke="#1c2d3b" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+        <circle cx="200" cy="51" r="3.4" fill="#06090c" />
+        <circle cx="201" cy="50" r="1" fill="#fff" />
       </g>
-      <path d="M30 44 C60 36 85 30 105 26 C112 12 124 6 132 8 C130 16 130 22 138 24 C160 26 172 32 180 38 C192 42 204 46 214 50 C204 53 192 54 180 56 C160 68 120 80 90 72 C65 66 45 54 30 48Z" fill="url(#dp-body)" />
-      <path d="M135 60 C130 74 120 82 108 88 C124 84 138 76 148 62Z" fill="#4b6a85" />
-      <path d="M214 50 C200 52 190 54 180 52" stroke="#2c3e50" strokeWidth="1.4" fill="none" />
-      <circle cx="178" cy="44" r="2.6" fill="#0b1115" />
-      <circle cx="178.8" cy="43.2" r="0.8" fill="#fff" />
+
+      {/* Water droplets flung off the tail */}
+      {[[8, 104, 3], [22, 112, 2.2], [2, 94, 2.4], [28, 102, 1.8], [14, 116, 1.6]].map(([x, y, r], i) => (
+        <circle key={i} cx={x} cy={y} r={r} fill="#cfeaf5" opacity="0.8" />
+      ))}
     </svg>
   );
 }
 
 function Shark() {
+  const body =
+    "M34 58 C62 54 92 44 114 38 C120 28 126 14 136 4 C140 16 146 28 152 37 C180 38 214 48 238 62 C246 64 252 68 252 72 C244 76 232 80 214 84 C190 96 150 100 118 94 C86 90 56 78 34 68Z";
+  // Open mouth along the underside of the snout
+  const mouth = "M250 73 C240 75 228 77 216 79 C226 81 240 77.5 250 73Z";
+  const teethX = [243, 237, 231, 225, 219];
+  const toothY = (x: number) => 73 + ((250 - x) * 6) / 34; // follows the upper jaw edge
   return (
-    <svg viewBox="0 0 240 110" width="100%">
+    <svg viewBox="0 0 260 120" width="100%" overflow="visible">
       <defs>
-        <linearGradient id="sk-body" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#3d4852" />
-          <stop offset="0.5" stopColor="#6c7b88" />
-          <stop offset="0.56" stopColor="#eef2f5" />
-          <stop offset="1" stopColor="#ffffff" />
+        <linearGradient id="sk-back" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#323f4a" />
+          <stop offset="1" stopColor="#74838f" />
         </linearGradient>
+        <linearGradient id="sk-fin" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#3a4752" />
+          <stop offset="1" stopColor="#6a7883" />
+        </linearGradient>
+        <clipPath id="sk-clip">
+          <path d={body} />
+        </clipPath>
       </defs>
-      <g className="wag" style={wag(36, 58, 7, 1.1)}>
-        <path d="M38 50 L6 24 C8 40 12 52 16 58 C12 66 8 78 4 96 L38 66Z" fill="#56626d" />
+
+      {/* Tail */}
+      <g className="wag" style={wag(46, 62, 9, 1)}>
+        <path d="M46 58 C36 44 24 24 6 4 C24 8 40 20 46 34 C50 42 52 50 52 58Z" fill="url(#sk-fin)" />
+        <path d="M46 66 C38 78 30 92 18 108 C34 102 46 94 52 84 C54 78 54 72 52 66Z" fill="url(#sk-fin)" />
       </g>
-      <path d="M232 58 C214 40 180 28 150 24 L140 4 C132 14 124 22 118 26 C90 30 56 40 34 50 L34 66 C60 74 90 82 118 84 C150 86 190 78 232 58Z" fill="url(#sk-body)" />
-      <path d="M170 62 C160 80 140 96 118 104 C140 96 156 84 184 66Z" fill="#4b5762" />
-      <path d="M186 48 C184 54 184 60 186 66 M192 48 C190 54 190 60 192 66 M198 49 C196 54 196 59 198 64" stroke="#2c353d" strokeWidth="1.6" opacity="0.6" fill="none" />
-      <path d="M232 58 C224 64 214 66 204 64" stroke="#1a1f24" strokeWidth="1.8" fill="none" />
-      <circle cx="214" cy="50" r="3.2" fill="#0b0b0b" />
-      <circle cx="215" cy="49" r="0.9" fill="#fff" />
+
+      {/* Lower fins */}
+      <path d="M104 92 C98 100 92 104 84 106 C92 100 96 94 98 90Z" fill="url(#sk-fin)" />
+      <path d="M62 80 C58 86 54 88 48 90 C52 86 54 82 56 78Z" fill="url(#sk-fin)" />
+
+      {/* Body: dark back, white belly with a jagged countershading line */}
+      <path d={body} fill="url(#sk-back)" />
+      <g clipPath="url(#sk-clip)">
+        <path
+          d="M30 70 C48 76 60 66 82 72 C96 76 104 68 124 72 C142 76 156 64 178 69 C196 73 212 66 232 68 C242 69 250 68 256 70 L256 110 L30 110Z"
+          fill="#f3f6f8"
+        />
+        <path d="M70 52 C100 42 140 40 190 46" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" opacity="0.14" fill="none" />
+
+        {/* Mouth and teeth: everything here is clipped to the body, so nothing can stick out */}
+        <path d={mouth} fill="#3a0f14" />
+        {teethX.map((x) => (
+          <path key={x} d={`M${x} ${toothY(x)} l2.5 3 l2.5 -3Z`} fill="#fff" />
+        ))}
+      </g>
+
+      {/* Scars and gill slits */}
+      <path d="M130 52 L146 58 M134 48 L148 53" stroke="#d7dde1" strokeWidth="1.3" strokeLinecap="round" opacity="0.4" />
+      {[0, 6, 12, 18, 24].map((dx) => (
+        <path key={dx} d={`M${170 + dx} 54 C${168 + dx} 62 ${168 + dx} 70 ${171 + dx} 77`} stroke="#222d36" strokeWidth="1.8" fill="none" opacity="0.7" />
+      ))}
+
+      {/* Pectoral fin */}
+      <g className="wag" style={wag(166, 74, 8, 1.6)}>
+        <path d="M170 72 C160 92 140 108 112 116 C132 104 144 92 150 76Z" fill="url(#sk-fin)" />
+      </g>
+
+      {/* Jaw line */}
+      <path d="M250 73 C240 75 228 77 216 79" stroke="#1e1313" strokeWidth="1.4" strokeLinecap="round" fill="none" />
+
+      {/* Cold black eye and nostril */}
+      <circle cx="226" cy="62" r="4.2" fill="#161b20" />
+      <circle cx="226" cy="62" r="3" fill="#020304" />
+      <circle cx="227.2" cy="60.8" r="0.9" fill="#fff" opacity="0.8" />
+      <circle cx="243" cy="62" r="1.2" fill="#1c252d" />
     </svg>
   );
 }
@@ -383,39 +466,60 @@ function Whale() {
 }
 
 function SeaDragon() {
-  const body = "M150 42 C120 46 92 60 72 82 C52 104 60 130 90 128 C112 126 114 108 100 108";
-  // [x, y, rotation] for leaf-like appendages along the body
-  const leaves: [number, number, number][] = [
-    [138, 39, -65], [118, 44, -85], [100, 54, -105], [86, 68, -130], [70, 84, -150], [62, 100, -170],
-    [132, 45, 70], [112, 53, 80], [94, 64, 100], [76, 80, 120], [64, 106, 150], [70, 120, 100],
+  const spine = "M184 44 C150 40 118 52 96 76 C74 100 78 130 108 134 C128 136 134 118 120 114";
+  // [x, y, rotation, scale] for fronds along the body
+  const leaves: [number, number, number, number][] = [
+    [186, 36, -62, 0.8], [178, 40, -72, 1], [160, 42, -88, 1.2], [146, 45, -96, 0.9],
+    [134, 49, -104, 1.25], [122, 54, -112, 0.9], [112, 61, -126, 1.2], [102, 70, -142, 1],
+    [92, 82, -160, 1.25], [84, 96, -172, 1], [82, 110, 180, 1.2], [86, 123, 168, 1],
+    [170, 47, 60, 0.9], [150, 47, 74, 1], [132, 54, 82, 1.1], [116, 64, 96, 0.9],
+    [100, 78, 112, 1], [92, 98, 20, 0.9],
   ];
   return (
-    <svg viewBox="0 0 200 140" width="100%">
+    <svg viewBox="0 0 240 160" width="100%" overflow="visible">
       <defs>
         <linearGradient id="sd-leaf" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#b59a2a" />
-          <stop offset="1" stopColor="#6f8a3a" stopOpacity="0.55" />
+          <stop offset="0" stopColor="#d9b53a" />
+          <stop offset="0.6" stopColor="#7fa04a" />
+          <stop offset="1" stopColor="#4f9a7a" stopOpacity="0.5" />
+        </linearGradient>
+        <linearGradient id="sd-head" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#e8c45a" />
+          <stop offset="1" stopColor="#a8761c" />
         </linearGradient>
       </defs>
-      {leaves.map(([x, y, r], i) => (
-        <g key={i} transform={`translate(${x} ${y}) rotate(${r})`}>
-          <path
-            className="wag"
-            style={{ ...wag(0, 0, 10, 1.4 + (i % 4) * 0.3), animationDelay: `${-i * 0.25}s` }}
-            d="M0 0 C6 -9 18 -12 26 -5 C18 3 8 6 0 0Z"
-            fill="url(#sd-leaf)"
-            stroke="#6b5410"
-            strokeOpacity="0.5"
-          />
-        </g>
-      ))}
-      <path d={body} stroke="#8a6a14" strokeWidth="14" strokeLinecap="round" fill="none" />
-      <path d={body} stroke="#c9a52d" strokeWidth="10" strokeLinecap="round" fill="none" />
-      <path d={body} stroke="#f0d776" strokeWidth="3" strokeLinecap="round" opacity="0.5" fill="none" transform="translate(-1.5 -2)" />
-      <ellipse cx="150" cy="43" rx="13" ry="8.5" transform="rotate(12 150 43)" fill="#c9a52d" />
-      <path d="M158 41 L188 45 C188 47 188 48 187 49 L158 50Z" fill="#d9b83f" />
-      <circle cx="146" cy="40" r="3.2" fill="#111" />
-      <circle cx="147" cy="39" r="0.9" fill="#fff" />
+
+      <g style={{ filter: "drop-shadow(0 0 6px rgba(255, 214, 90, 0.55))" }}>
+        {/* Fronds */}
+        {leaves.map(([x, y, r, s], i) => (
+          <g key={i} transform={`translate(${x} ${y}) rotate(${r}) scale(${s})`}>
+            <g className="wag" style={{ ...wag(0, 0, 11, 1.3 + (i % 5) * 0.25), animationDelay: `${-i * 0.22}s` }}>
+              <path d="M0 0 C8 -14 26 -18 42 -6 C28 5 10 9 0 0Z" fill="url(#sd-leaf)" stroke="#6b5410" strokeOpacity="0.45" strokeWidth="0.8" />
+              <path d="M3 0 C16 -4 28 -6 38 -6" stroke="#f3e08a" strokeWidth="0.9" opacity="0.7" fill="none" />
+            </g>
+          </g>
+        ))}
+
+        {/* Banded body */}
+        <path d={spine} stroke="#6e4f10" strokeWidth="17" strokeLinecap="round" fill="none" />
+        <path d={spine} stroke="#c99a2e" strokeWidth="13" strokeLinecap="round" fill="none" />
+        <path d={spine} stroke="#7b4d97" strokeWidth="11" strokeDasharray="2 9" fill="none" opacity="0.6" />
+        <path d={spine} stroke="#f0d776" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.55" transform="translate(-1.5 -3)" />
+
+        {/* Glowing tail tip and body lights */}
+        <circle cx="120" cy="114" r="3" fill="#fff3b0" opacity="0.9" />
+        {[[150, 41], [128, 49], [108, 63], [90, 84], [84, 108]].map(([x, y], i) => (
+          <circle key={i} cx={x} cy={y} r="1.6" fill="#fff6c0" opacity="0.8" />
+        ))}
+
+        {/* Head and long snout */}
+        <ellipse cx="190" cy="44" rx="13" ry="9" transform="rotate(14 190 44)" fill="url(#sd-head)" />
+        <path d="M198 41 L230 48 C233 49 233 53 230 54 L198 52Z" fill="url(#sd-head)" />
+        <path d="M200 50 L230 52" stroke="#6e4f10" strokeWidth="1" opacity="0.6" />
+        <circle cx="196" cy="42" r="4.8" fill="none" stroke="#f6d873" strokeWidth="1.4" />
+        <circle cx="196" cy="42" r="3.2" fill="#2b1a05" />
+        <circle cx="197" cy="41" r="0.9" fill="#fff" />
+      </g>
     </svg>
   );
 }
